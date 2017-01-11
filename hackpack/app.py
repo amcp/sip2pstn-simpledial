@@ -18,7 +18,9 @@ def str2bool(v):
 # Voice Request URL
 @app.route('/voice', methods=['GET', 'POST'])
 def voice():
+    print str(request)
     to = request.values.get('To', None)
+    print "to: " + str(to)
     if to is None:
         return ("Point the voice URL of your registration-enabled Twilio SIP domain to this script. "
                 "You will see what it can do for you :-)")
@@ -35,7 +37,9 @@ def voice():
         to = "+1{0}".format(found_us_pstn.group(1))
 
     answer_on_bridge = str2bool(request.values.get('answerOnBridge', "True"))
+    print "answer_on_bridge: " + str(answer_on_bridge)
     record_param = request.values.get('record', 'do-not-record')
+    print "record_param: " + str(record_param)
 
     response = twiml.Response()
 
@@ -44,9 +48,12 @@ def voice():
             d.sip(to)
     else:
         caller_id = request.values.get('callerId', app.config['TWILIO_CALLER_ID'])
+        print "caller_id before strip: " + str(caller_id)
+        caller_id = caller_id.strip()
+        print "caller_id aftewr strip: " + str(caller_id)
         with response.dial(answerOnBridge=answer_on_bridge, callerId=caller_id, record=record_param) as d:
             d.number(to)
-
+    print str(response)
     return str(response)
 
 
